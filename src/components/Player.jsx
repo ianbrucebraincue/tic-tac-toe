@@ -4,17 +4,12 @@ export default function Player({ name, symbol }) {
   const [isEditing, setIsEditing] = useState(false);
   const [editedName, setEditedName] = useState(name);
 
-  function handleEditClick() {
-    setIsEditing(true);
+  function handleEditSaveClick() {
+    setIsEditing((editing) => !editing);
   }
 
   function handleNameChange(event) {
     setEditedName(event.target.value);
-  }
-
-  function handleSaveClick() {
-    // Here you would typically update the player's name in the parent component or global state
-    setIsEditing(false);
   }
 
   return (
@@ -32,7 +27,7 @@ export default function Player({ name, symbol }) {
         )}
         <span className="player-symbol">{symbol}</span>
       </span>
-      <button onClick={isEditing ? handleSaveClick : handleEditClick}>
+      <button onClick={handleEditSaveClick}>
         {isEditing ? "Save" : "Edit"}
       </button>
     </li>
