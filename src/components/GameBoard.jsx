@@ -1,22 +1,20 @@
-import { useState } from "react";
-
 const initialGameBoard = [
   [null, null, null],
   [null, null, null],
   [null, null, null]
 ]
 
-export default function GameBoard() {
-  const [gameBoard, setGameBoard] = useState(initialGameBoard);
+export default function GameBoard({ onSelectCell, gameTurns }) {
+  // computed value derived from state
+  // manage as little state as needed
+  let gameBoard = initialGameBoard.map(row => [...row]);
 
-  function handleCellClick(rowIndex, cellIndex, playerSymbol = 'X') {
-    setGameBoard((prevGameBoard) => function updateGameBoard() {
-      const newGameBoard = [...prevGameBoard];
-      if (newGameBoard[rowIndex][cellIndex] === null ) {
-        newGameBoard[rowIndex][cellIndex] = playerSymbol;
-      }
-      return newGameBoard;
-    }());
+  for (const gameTurn of gameTurns) {
+    const { square, player } = gameTurn;
+    const { row, cell } = square;
+
+    //location in array/board set equal to the player symbol
+    gameBoard[row][cell] = player; 
   }
 
   return (
@@ -26,7 +24,7 @@ export default function GameBoard() {
         <ol>
           {row.map((playerSymbol, cellIndex) => 
           <li key={cellIndex}>
-            <button onClick={() => handleCellClick(rowIndex, cellIndex)}>{playerSymbol}</button>
+            <button onClick={() => onSelectCell(rowIndex, cellIndex)}>{playerSymbol}</button>
             </li>)}
         </ol>
       </li> )}
