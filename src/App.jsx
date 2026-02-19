@@ -3,6 +3,7 @@ import { useState } from "react";
 import Player from "./components/Player";
 import GameBoard from "./components/GameBoard";
 import Log from "./components/Log";
+import GameOver from "./components/GameOver";
 import { WINNING_COMBINATIONS } from "./winning-combinations";
 
 const initialGameBoard = [
@@ -26,7 +27,7 @@ function App() {
 
   const activePlayer = deriveActivePlayer(gameTurns);
 
-  let gameBoard = initialGameBoard.map(row => [...row]);
+  let gameBoard = [...initialGameBoard.map(array => [...array])]; // create a copy of the initial game board
 
   for (const gameTurn of gameTurns) {
     const { square, player } = gameTurn;
@@ -49,6 +50,8 @@ function App() {
     }
   }
 
+  const hasDraw = gameTurns.length === 9 && !winner;
+
   function handlePlayerChange(rowIndex, cellIndex) {
 
     setGameTurns((prevGameTurns) => {
@@ -61,6 +64,10 @@ function App() {
 
       return updatedGameTurns;
     })
+  }
+
+  function handlePlayAgain() {
+    setGameTurns([]);
   }
 
   return (
@@ -76,7 +83,7 @@ function App() {
         board={gameBoard}
         />
       </div>
-      {winner && <p id="winner-message">Player {winner} wins!</p>}
+      {(winner || hasDraw) && <GameOver winner={winner} onPlayAgain={handlePlayAgain} />}
       <Log gameTurns={gameTurns} />
     </main>
   )
