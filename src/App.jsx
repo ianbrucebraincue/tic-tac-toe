@@ -1,23 +1,58 @@
-import { useState } from "react"
+import { useState } from "react";
 
-import Player from "./components/Player"
-import GameBoard from "./components/GameBoard"
-import Log from "./components/Log"
+import Player from "./components/Player";
+import GameBoard from "./components/GameBoard";
+import Log from "./components/Log";
+import { WINNING_COMBINATIONS } from "./winning-combinations";
 
+const initialGameBoard = [
+  [null, null, null],
+  [null, null, null],
+  [null, null, null]
+]
+
+function deriveActivePlayer(gameTurns) {
+  let currentPlayer = 'X';
+
+  if (gameTurns.length > 0 && gameTurns[0].player === 'X') {
+    currentPlayer = 'O';
+  }
+
+  return currentPlayer;
+}
 
 function App() {
   const [gameTurns, setGameTurns] = useState([]);
-  const [activePlayer, setActivePlayer] = useState("X");
+
+  const activePlayer = deriveActivePlayer(gameTurns);
+
+  let gameBoard = initialGameBoard.map(row => [...row]);
+
+  for (const gameTurn of gameTurns) {
+    const { square, player } = gameTurn;
+    const { row, cell } = square;
+
+    //location in array/board set equal to the player symbol
+    gameBoard[row][cell] = player; 
+  }
+
+  let winner = null;
+
+  for (const combination of WINNING_COMBINATIONS) {
+    const firstSquareSymbol = gameBoard[combination[0].row][combination[0].column];
+    const secondSquareSymbol = gameBoard[combination[1].row][combination[1].column];
+    const thirdSquareSymbol = gameBoard[combination[2].row][combination[2].column];
+
+    if (firstSquareSymbol && firstSquareSymbol === secondSquareSymbol && firstSquareSymbol === thirdSquareSymbol) {
+      winner = firstSquareSymbol;
+      break;
+    }
+  }
 
   function handlePlayerChange(rowIndex, cellIndex) {
-    setActivePlayer((curActivePlayer) => curActivePlayer === "X" ? "O" : "X");
 
     setGameTurns((prevGameTurns) => {
-      let currentPlayer = 'X';
-
-      if (prevGameTurns.length > 0 && prevGameTurns[0].player === 'X') {
-        currentPlayer = 'O';
-      }
+      const currentPlayer = deriveActivePlayer(prevGameTurns);
 
       const updatedGameTurns = [
         { square: { row: rowIndex, cell: cellIndex }, player: currentPlayer },
@@ -38,10 +73,11 @@ function App() {
 
         <GameBoard 
         onSelectCell={handlePlayerChange} 
-        gameTurns={gameTurns}
+        board={gameBoard}
         />
       </div>
-      <Log />
+      {winner && <p id="winner-message">Player {winner} wins!</p>}
+      <Log gameTurns={gameTurns} />
     </main>
   )
 }
